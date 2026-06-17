@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Nueva reservación</title>
+</head>
+<body>
+    <h1>Nueva reservación</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <button type="submit">Guardar reservación</button>
+    </form>
+
+    <p>
+        <a href="{% url 'lista_reservaciones' %}">Ver reservaciones</a>
+    </p>
+</body>
+</html>

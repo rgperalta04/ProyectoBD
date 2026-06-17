@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reservaciones</title>
+</head>
+<body>
+    <h1>Reservaciones</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <p>
+        <a href="{% url 'crear_reservacion' %}">Nueva reservación</a>
+    </p>
+
+    {% if reservaciones %}
+        <table border="1" cellpadding="8">
+            <thead>
+                <tr>
+                    <th>Evento</th>
+                    <th>Registra</th>
+                    <th>Fecha</th>
+                    <th>Horario</th>
+                    <th>Asistentes</th>
+                    <th>Salas</th>
+                    <th>Estatus</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reservacion in reservaciones %}
+                    <tr>
+                        <td>{{ reservacion.nombre_evento }}</td>
+                        <td>{{ reservacion.nombre_registra }}</td>
+                        <td>{{ reservacion.fecha_evento }}</td>
+                        <td>{{ reservacion.hora_inicio }} - {{ reservacion.hora_fin }}</td>
+                        <td>{{ reservacion.asistentes }}</td>
+                        <td>
+                            {% for sala in reservacion.salas.all %}
+                                {{ sala.nombre }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>{{ reservacion.estatus }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No hay reservaciones registradas.</p>
+    {% endif %}
+</body>
+</html>
