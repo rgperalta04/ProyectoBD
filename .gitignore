@@ -1,0 +1,39 @@
+# Entorno virtual
+venv/
+
+# Base de datos local de Django
+db.sqlite3
+
+# Archivos compilados de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Migraciones generadas
+# OJO: normalmente sí puedes subir migraciones.
+# Si tu profe quiere revisar la estructura de la BD, deja esta línea comentada.
+# proyectobd/migrations/
+
+# Variables de entorno / secretos
+.env
+.env.*
+
+# Archivos de macOS
+.DS_Store
+
+# Archivos de VS Code
+.vscode/
+
+# Archivos de pruebas/cobertura
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Archivos estáticos recolectados por Django
+staticfiles/
+
+# Archivos subidos por usuarios
+media/
+
+# Logs
+*.log
