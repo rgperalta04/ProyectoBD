@@ -73,10 +73,22 @@ class ReservacionForm(forms.ModelForm):
         fecha_evento = cleaned_data.get('fecha_evento')
         hora_inicio = cleaned_data.get('hora_inicio')
         hora_fin = cleaned_data.get('hora_fin')
+        asistentes = cleaned_data.get('asistentes')
         salas = cleaned_data.get('salas')
 
         if hora_inicio and hora_fin and hora_fin <= hora_inicio:
             raise forms.ValidationError('La hora de fin debe ser posterior a la hora de inicio.')
+
+        if asistentes and salas:
+            capacidad_total = sum(sala.capacidad for sala in salas)
+
+            if capacidad_total < asistentes:
+                raise forms.ValidationError(
+                    f'La capacidad de las salas seleccionadas es insuficiente. '
+                    f'Capacidad total: {capacidad_total}. '
+                    f'Asistentes registrados: {asistentes}. '
+                    f'Selecciona más salas o una sala con mayor capacidad.'
+                )
 
         if fecha_evento and hora_inicio and hora_fin and salas:
             reservaciones_empalmadas = Reservacion.objects.filter(
@@ -86,9 +98,10 @@ class ReservacionForm(forms.ModelForm):
                 hora_inicio__lt=hora_fin,
                 hora_fin__gt=hora_inicio,
             ).distinct()
+
             if self.instance and self.instance.pk:
                 reservaciones_empalmadas = reservaciones_empalmadas.exclude(pk=self.instance.pk)
-                
+
             if reservaciones_empalmadas.exists():
                 salas_ocupadas = []
 
@@ -99,7 +112,9 @@ class ReservacionForm(forms.ModelForm):
                 salas_ocupadas = sorted(set(salas_ocupadas))
 
                 raise forms.ValidationError(
-                    f'No se puede hacer la reservación. Las siguientes salas ya están ocupadas en ese horario: {", ".join(salas_ocupadas)}.'
+                    f'No se puede hacer la reservación. '
+                    f'Las siguientes salas ya están ocupadas en ese horario: '
+                    f'{", ".join(salas_ocupadas)}.'
                 )
 
         return cleaned_data
