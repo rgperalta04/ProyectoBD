@@ -50,3 +50,89 @@ def detalle_reservacion(request, reservacion_id):
     return render(request, 'proyectobd/detalle_reservacion.html', {
         'reservacion': reservacion
     })
+
+@login_required
+def confirmar_reservacion(request, reservacion_id):
+    reservacion = get_object_or_404(Reservacion, id=reservacion_id)
+
+    if request.method == 'POST':
+        reservacion.estatus = 'CONFIRMADA'
+        reservacion.save()
+
+        HistorialReservacion.objects.create(
+            reservacion=reservacion,
+            usuario=request.user,
+            accion='CONFIRMACION',
+            descripcion='Reservación confirmada.'
+        )
+
+        messages.success(request, 'La reservación fue confirmada correctamente.')
+
+    return redirect('detalle_reservacion', reservacion_id=reservacion.id)
+
+
+@login_required
+def cancelar_reservacion(request, reservacion_id):
+    reservacion = get_object_or_404(Reservacion, id=reservacion_id)
+
+    if request.method == 'POST':
+        reservacion.estatus = 'CANCELADA'
+        reservacion.save()
+
+        HistorialReservacion.objects.create(
+            reservacion=reservacion,
+            usuario=request.user,
+            accion='CANCELACION',
+            descripcion='Reservación cancelada.'
+        )
+
+        messages.success(request, 'La reservación fue cancelada correctamente.')
+
+    return redirect('detalle_reservacion', reservacion_id=reservacion.id)
+
+
+@login_required
+def finalizar_reservacion(request, reservacion_id):
+    reservacion = get_object_or_404(Reservacion, id=reservacion_id)
+
+    if request.method == 'POST':
+        reservacion.estatus = 'FINALIZADA'
+        reservacion.save()
+
+        HistorialReservacion.objects.create(
+            reservacion=reservacion,
+            usuario=request.user,
+            accion='FINALIZACION',
+            descripcion='Reservación finalizada.'
+        )
+
+        messages.success(request, 'La reservación fue finalizada correctamente.')
+
+    return redirect('detalle_reservacion', reservacion_id=reservacion.id)
+
+@login_required
+def editar_reservacion(request, reservacion_id):
+    reservacion = get_object_or_404(Reservacion, id=reservacion_id)
+
+    if request.method == 'POST':
+        form = ReservacionForm(request.POST, instance=reservacion)
+
+        if form.is_valid():
+            reservacion = form.save()
+
+            HistorialReservacion.objects.create(
+                reservacion=reservacion,
+                usuario=request.user,
+                accion='EDICION',
+                descripcion='Reservación editada por el administrador.'
+            )
+
+            messages.success(request, 'La reservación fue actualizada correctamente.')
+            return redirect('detalle_reservacion', reservacion_id=reservacion.id)
+    else:
+        form = ReservacionForm(instance=reservacion)
+
+    return render(request, 'proyectobd/editar_reservacion.html', {
+        'form': form,
+        'reservacion': reservacion
+    })

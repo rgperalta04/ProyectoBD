@@ -86,7 +86,9 @@ class ReservacionForm(forms.ModelForm):
                 hora_inicio__lt=hora_fin,
                 hora_fin__gt=hora_inicio,
             ).distinct()
-
+            if self.instance and self.instance.pk:
+                reservaciones_empalmadas = reservaciones_empalmadas.exclude(pk=self.instance.pk)
+                
             if reservaciones_empalmadas.exists():
                 salas_ocupadas = []
 

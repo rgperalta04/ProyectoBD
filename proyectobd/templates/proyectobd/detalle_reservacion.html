@@ -15,6 +15,32 @@
     <p><strong>Estatus:</strong> {{ reservacion.estatus }}</p>
     <p><strong>Observaciones:</strong> {{ reservacion.observaciones }}</p>
 
+    <h3>Acciones</h3>
+
+    {% if reservacion.estatus == 'PENDIENTE' %}
+        <form method="post" action="{% url 'confirmar_reservacion' reservacion.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit">Confirmar</button>
+        </form>
+
+        <form method="post" action="{% url 'cancelar_reservacion' reservacion.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit">Cancelar</button>
+        </form>
+    {% elif reservacion.estatus == 'CONFIRMADA' %}
+        <form method="post" action="{% url 'finalizar_reservacion' reservacion.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit">Finalizar</button>
+        </form>
+
+        <form method="post" action="{% url 'cancelar_reservacion' reservacion.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit">Cancelar</button>
+        </form>
+    {% else %}
+        <p>Esta reservación ya no tiene acciones disponibles.</p>
+    {% endif %}
+
     <h3>Salas</h3>
     <ul>
         {% for sala in reservacion.salas.all %}
@@ -32,7 +58,29 @@
     {% else %}
         <p>Sin requerimientos.</p>
     {% endif %}
+    <p>
+        <a href="{% url 'editar_reservacion' reservacion.id %}">Editar reservación</a>
+    </p>
+    <h3>Historial</h3>
 
+    {% with historial=reservacion.historialreservacion_set.all %}
+        {% if historial %}
+            <ul>
+                {% for movimiento in historial %}
+                    <li>
+                        {{ movimiento.fecha_accion }} -
+                        <strong>{{ movimiento.accion }}</strong> -
+                        {{ movimiento.usuario.username }}
+                        {% if movimiento.descripcion %}
+                            - {{ movimiento.descripcion }}
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Sin historial registrado.</p>
+        {% endif %}
+    {% endwith %}
     <p>
         <a href="{% url 'lista_reservaciones' %}">Volver a reservaciones</a>
     </p>
